@@ -1,0 +1,30 @@
+# Т4.Б1.4, вариант Б. Сервер PostgreSQL 18 в контейнере Docker.
+#   docker compose up -d                                        запуск
+#   docker compose exec db psql -U pokrytie -d pokrytie          консоль psql внутри контейнера
+#   docker compose exec db psql -U pokrytie -d pokrytie -f /data/archive.sql   загрузка архива для З2
+#   docker compose down                                         остановка (данные сохраняются)
+#   docker compose down -v                                      остановка и удаление всех данных
+# Пароль роли pokrytie берется из файла .env в этой же папке (POSTGRES_PASSWORD).
+
+services:
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: pokrytie
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?задайте POSTGRES_PASSWORD в файле .env}
+      POSTGRES_DB: pokrytie
+    ports:
+      - "127.0.0.1:5432:5432"          # сервер доступен только с этого компьютера
+    volumes:
+      - pgdata:/var/lib/postgresql     # с версии 18 данные лежат здесь, а не в /var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro   # выполняется при первом запуске: база pokrytie_test
+      - ./data:/data:ro                # архив поездок для задания З2
+      - ./sql:/sql:ro                  # ваши запросы q01.sql–q10.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pokrytie -d pokrytie"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:

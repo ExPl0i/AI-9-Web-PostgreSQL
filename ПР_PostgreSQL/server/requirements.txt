@@ -1,0 +1,7 @@
+# Версии зафиксированы: от них зависят тексты ошибок и поведение драйвера.
+# fastapi[standard] ставит Uvicorn, httpx (для TestClient) и команду fastapi.
+# psycopg[binary] – драйвер PostgreSQL вместе с библиотекой libpq, отдельно ставить ее не нужно.
+fastapi[standard]==0.162.0
+psycopg[binary]==3.3.8
+pydantic-settings==2.16.2
+pytest>=8.0
